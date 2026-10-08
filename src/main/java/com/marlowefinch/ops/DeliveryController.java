@@ -29,7 +29,11 @@ public class DeliveryController {
     @GetMapping("/api/deliveries/late")
     public List<LateDelivery> late(@RequestParam(required = false) String from,
                                    @RequestParam(required = false) String to,
-                                   @RequestParam(required = false, defaultValue = "" + DEFAULT_LIMIT) int limit) {
-        return repository.lateDeliveries(DateRange.resolve(from, to, clock), limit);
+                                   @RequestParam(required = false, defaultValue = "" + DEFAULT_LIMIT) String limit) {
+        QueryParams params = new QueryParams();
+        DateRange range = DateRange.resolve(from, to, clock, params);
+        int parsedLimit = params.limit(limit, DEFAULT_LIMIT);
+        params.throwIfInvalid();
+        return repository.lateDeliveries(range, parsedLimit);
     }
 }
